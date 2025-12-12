@@ -16,6 +16,9 @@ bun start
 - Unit tests: `cd expo-ai-chatbot && bun test --timeout 30000`
 - Expo health checks: `cd expo-ai-chatbot && npx expo-doctor`
 
+Notes:
+- `bun test` includes an offline-only guardrail test (`src/lib/policy/offlineGuard.test.ts`) to prevent accidental network usage in shipped code.
+
 ## Key flows
 
 - Onboarding: privacy notice + consent on first launch (`expo-ai-chatbot/src/app/(app)/onboarding.tsx`)

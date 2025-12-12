@@ -34,6 +34,7 @@ Run commands from `expo-ai-chatbot/` (there is no root `package.json`).
 - Tests live in `expo-ai-chatbot/src/**/**/*.test.ts`.
 - Prefer small, deterministic tests for parsers/crypto/DB helpers; avoid snapshotting large OCR output.
 - Run: `cd expo-ai-chatbot && bun test --timeout 30000`.
+- Offline-only policy is enforced by a guard test in `expo-ai-chatbot/src/lib/policy/offlineGuard.test.ts` (fails if shipped code introduces obvious network usage).
 
 ## Commit & Pull Request Guidelines
 

@@ -10,3 +10,6 @@ This repository contains a local-first MVP for reading Sabin exam PDFs on-device
 ## Expo app
 
 - `expo-ai-chatbot/` – Sabin Lumina (Expo): import PDF → extract text locally → parse markers → store encrypted in SQLite
+
+Offline-only guarantee:
+- The Expo app is intended to run with “no API / no cloud / no server”, and `bun test` includes an offline-only guard test to prevent accidental network client usage in shipped code.
