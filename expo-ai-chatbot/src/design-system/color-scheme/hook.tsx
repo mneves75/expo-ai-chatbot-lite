@@ -6,9 +6,12 @@ export const useColorScheme = () => {
   const colorSchemeContext = useContext(ColorSchemeContext);
 
   if (!colorSchemeContext) {
-    console.error(
-      "Please wrap your app with <ColorSchemeProvider> from @showtime-xyz/universal.color-scheme"
-    );
+    if (__DEV__) {
+      // Avoid logging in production builds.
+      console.error(
+        "Please wrap your app with <ColorSchemeProvider> from @showtime-xyz/universal.color-scheme",
+      );
+    }
   }
   // return colorSchemeContext;
   // TODO: fix

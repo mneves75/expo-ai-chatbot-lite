@@ -1,20 +1,12 @@
-# Expo AI Chatbot Lite
+# Sabin Lumina (local-first)
 
-ℹ️ This is a lite version of Expo AI Chatbot. It is a simplified version of the pro chatbot that is designed to be ready to use for commercial apps. It has Authentication, Suggested Actions / Tooling, Image Attachments, History drawer, Markdown support, new chat navigation, and best of all Next.js AI Chatbot Compatible. 
+This repository contains a local-first MVP for reading Sabin exam PDFs on-device (no API/cloud/server), plus two reference Next.js codebases.
 
-**Go get the pro version here** → [expoaichatbot.com](https://www.expoaichatbot.com)
+## Reference codebases
 
+- `ai-chatbot/` – Chat SDK template (Next.js)
+- `nextjs-ai-chatbot/` – Next.js AI Chatbot template
 
----
-## Chat SDK  reference codebase (use above version 1.0 of Expo AI Chatbot)
+## Expo app
 
-Reference nextjs-ai-chatbot [README.md](./ai-chatbot/README.md)
-
-## Next.js AI Chatbot reference codebase (use below version 1.0 of Expo AI Chatbot)
-
-Reference nextjs-ai-chatbot [README.md](./nextjs-ai-chatbot/README.md)
-
-## Expo AI Chatbot setup
-
-Reference expo-ai-chatbot [README.md](./expo-ai-chatbot/README.md)
-
+- `expo-ai-chatbot/` – Sabin Lumina (Expo): import PDF → extract text locally → parse markers → store encrypted in SQLite

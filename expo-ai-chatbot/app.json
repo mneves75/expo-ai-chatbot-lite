@@ -10,7 +10,9 @@
       "output": "server",
       "bundler": "metro"
     },
-    "assetBundlePatterns": ["src/assets/**/*"],
+    "assetBundlePatterns": [
+      "src/assets/**/*"
+    ],
     "plugins": [
       [
         "expo-router",
@@ -45,7 +47,9 @@
           "image": "./src/assets/splash.png",
           "imageWidth": 200
         }
-      ]
+      ],
+      "expo-sqlite",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true

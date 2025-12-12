@@ -1,0 +1,27 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+
+def expoModulesCorePlugin = new File(project(":expo-modules-core").projectDir.absolutePath, "ExpoModulesCorePlugin.gradle")
+if (expoModulesCorePlugin.exists()) {
+  apply from: expoModulesCorePlugin
+  applyKotlinExpoModulesCorePlugin()
+}
+
+android {
+  namespace "expo.modules.luminapdfrenderer"
+  compileSdkVersion 34
+
+  defaultConfig {
+    minSdkVersion 21
+    targetSdkVersion 34
+  }
+
+  kotlinOptions {
+    jvmTarget = "11"
+  }
+}
+
+dependencies {
+  implementation project(':expo-modules-core')
+}
+

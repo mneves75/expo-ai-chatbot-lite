@@ -1,0 +1,10 @@
+{
+  "platforms": ["ios", "android"],
+  "ios": {
+    "modules": ["ExpoLuminaPdfRendererModule"]
+  },
+  "android": {
+    "modules": ["expo.modules.luminapdfrenderer.ExpoLuminaPdfRendererModule"]
+  }
+}
+
