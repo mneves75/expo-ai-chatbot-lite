@@ -20,6 +20,12 @@ Notes:
 - `bun test` includes an offline-only guardrail test (`src/lib/policy/offlineGuard.test.ts`) to prevent accidental network usage in shipped code.
 - PDF text extraction on iOS/Android is implemented in the native module `expo-ai-chatbot/packages/expo-lumina-pdf-renderer/`; after native changes, rebuild the dev client (`bun ios` / `bun android`).
 
+## Troubleshooting
+
+- Metro bundling error about Node stdlib `crypto` (e.g. “You attempted to import the Node standard library module `crypto`…”):
+  - Ensure you’re on the latest `main` (`git pull`).
+  - Restart Metro with a clean cache: `cd expo-ai-chatbot && npx expo start --clear` (or `bun start -- --clear`).
+
 ## Key flows
 
 - Onboarding: privacy notice + consent on first launch (`expo-ai-chatbot/src/app/(app)/onboarding.tsx`)

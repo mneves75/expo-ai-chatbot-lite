@@ -21,6 +21,7 @@ All notable changes to this repository will be documented in this file.
 - Fixed iOS/Metro bundling by removing any dependency on Node’s `crypto` module (randomness now uses Web Crypto when available, otherwise `expo-crypto`).
 - Fixed iOS/Metro bundling for `pdfjs-dist` by enabling Babel support for static class blocks and polyfilling `Promise.withResolvers` when missing.
 - Added native PDF text extraction for on-device parsing (PDFKit on iOS; pageCount-only on Android), avoiding Hermes-incompatible dynamic imports from `pdfjs-dist` in native bundles.
+- Documented troubleshooting steps for Metro “Node stdlib `crypto`” bundling errors.
 
 ### Security
 - Best-effort cleanup for temporary cache artifacts created during import/export and OCR rendering, to reduce unencrypted residue on device.
