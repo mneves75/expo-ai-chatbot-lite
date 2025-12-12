@@ -19,6 +19,30 @@ class ExpoLuminaPdfRendererModule : Module() {
       val ctx = appContext.reactContext ?: throw Exception("Missing React context")
       renderPdfPagesToPngs(ctx, pdfUri, options ?: emptyMap())
     }
+
+    AsyncFunction("extractPdfText") { pdfUri: String ->
+      val ctx = appContext.reactContext ?: throw Exception("Missing React context")
+      extractPdfText(ctx, pdfUri)
+    }
+  }
+
+  private fun extractPdfText(context: Context, pdfUri: String): Map<String, Any> {
+    // Android's PdfRenderer does not expose a text extraction API. We return the pageCount
+    // (useful for heuristics) and an empty string; callers can fall back to OCR when needed.
+    val uri = Uri.parse(pdfUri)
+    val pfd = openParcelFileDescriptor(context.contentResolver, uri)
+      ?: throw Exception("Unable to open PDF: $pdfUri")
+
+    var pageCount = 0
+    PdfRenderer(pfd).use { renderer ->
+      pageCount = renderer.pageCount
+    }
+
+    pfd.close()
+    return mapOf(
+      "text" to "",
+      "pageCount" to pageCount
+    )
   }
 
   private fun renderPdfPagesToPngs(context: Context, pdfUri: String, options: Map<String, Any>): List<String> {
@@ -62,4 +86,3 @@ class ExpoLuminaPdfRendererModule : Module() {
     return resolver.openFileDescriptor(uri, "r")
   }
 }
-

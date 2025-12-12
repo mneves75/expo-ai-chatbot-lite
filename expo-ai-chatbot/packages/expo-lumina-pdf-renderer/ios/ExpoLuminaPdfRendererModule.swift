@@ -15,6 +15,33 @@ public class ExpoLuminaPdfRendererModule: Module {
         promise.reject("PDF_RENDER_ERROR", error.localizedDescription, error)
       }
     }
+
+    AsyncFunction("extractPdfText") { (pdfUri: String, promise: Promise) in
+      do {
+        let result = try self.extractPdfText(pdfUri: pdfUri)
+        promise.resolve(result)
+      } catch {
+        promise.reject("PDF_TEXT_EXTRACT_ERROR", error.localizedDescription, error)
+      }
+    }
+  }
+
+  private func extractPdfText(pdfUri: String) throws -> [String: Any] {
+    guard let url = URL(string: pdfUri) ?? URL(string: pdfUri.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "") else {
+      throw NSError(domain: "ExpoLuminaPdfRenderer", code: 1, userInfo: [NSLocalizedDescriptionKey: "Invalid pdfUri"])
+    }
+
+    guard let document = PDFDocument(url: url) else {
+      throw NSError(domain: "ExpoLuminaPdfRenderer", code: 2, userInfo: [NSLocalizedDescriptionKey: "Unable to open PDF"])
+    }
+
+    // PDFKit can extract the embedded text layer when present. For scanned/image-only PDFs,
+    // `document.string` will often be empty, which is a signal to fall back to OCR.
+    let text = document.string ?? ""
+    return [
+      "text": text,
+      "pageCount": document.pageCount
+    ]
   }
 
   private func renderPdfPagesToPngs(pdfUri: String, options: [String: Any]) throws -> [String] {
@@ -78,4 +105,3 @@ public class ExpoLuminaPdfRendererModule: Module {
     return results
   }
 }
-

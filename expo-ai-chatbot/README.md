@@ -18,6 +18,7 @@ bun start
 
 Notes:
 - `bun test` includes an offline-only guardrail test (`src/lib/policy/offlineGuard.test.ts`) to prevent accidental network usage in shipped code.
+- PDF text extraction on iOS/Android is implemented in the native module `expo-ai-chatbot/packages/expo-lumina-pdf-renderer/`; after native changes, rebuild the dev client (`bun ios` / `bun android`).
 
 ## Key flows
 

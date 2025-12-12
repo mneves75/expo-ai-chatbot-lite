@@ -18,6 +18,9 @@ All notable changes to this repository will be documented in this file.
 - Added a dedicated Expo app typecheck config (`expo-ai-chatbot/tsconfig.typecheck.json`) so `bun run typecheck` checks only production code (tests are still verified by `bun test`).
 - Switched report ID generation to crypto-grade UUID v4 (avoids `Math.random` collisions in persisted keys).
 - Strengthened DB correctness: schema versioning (`PRAGMA user_version`), atomic “delete all reports”, and regression tests enforcing offline-only behavior.
+- Fixed iOS/Metro bundling by removing any dependency on Node’s `crypto` module (randomness now uses Web Crypto when available, otherwise `expo-crypto`).
+- Fixed iOS/Metro bundling for `pdfjs-dist` by enabling Babel support for static class blocks and polyfilling `Promise.withResolvers` when missing.
+- Added native PDF text extraction for on-device parsing (PDFKit on iOS; pageCount-only on Android), avoiding Hermes-incompatible dynamic imports from `pdfjs-dist` in native bundles.
 
 ### Security
 - Best-effort cleanup for temporary cache artifacts created during import/export and OCR rendering, to reduce unencrypted residue on device.
