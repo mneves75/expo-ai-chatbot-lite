@@ -12,7 +12,7 @@ All notable changes to this repository will be documented in this file.
 
 ### Changed
 - Removed cloud/server dependencies and network-first helpers to enforce “no API / no cloud / no server” operation.
+- Removed unused legacy chat/weather UI components (including external-link buttons) to keep the Expo app focused on the on-device vault flows.
 
 ### Security
 - Best-effort cleanup for temporary cache artifacts created during import/export and OCR rendering, to reduce unencrypted residue on device.
-
