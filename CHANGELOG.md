@@ -14,6 +14,8 @@ All notable changes to this repository will be documented in this file.
 - Removed cloud/server dependencies and network-first helpers to enforce “no API / no cloud / no server” operation.
 - Removed unused legacy chat/weather UI components (including external-link buttons) to keep the Expo app focused on the on-device vault flows.
 - Removed unused component helper files from the Expo `src/components/` folder to reduce dead code.
+- Modernized the Expo SQLite wrapper to the current `expo-sqlite` API and removed unused template theme/UI plumbing (providers/toasts/design-system) to keep the shipped app minimal and maintainable.
+- Added a dedicated Expo app typecheck config (`expo-ai-chatbot/tsconfig.typecheck.json`) so `bun run typecheck` checks only production code (tests are still verified by `bun test`).
 
 ### Security
 - Best-effort cleanup for temporary cache artifacts created during import/export and OCR rendering, to reduce unencrypted residue on device.

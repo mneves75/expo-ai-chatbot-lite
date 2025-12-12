@@ -1,9 +1,11 @@
+import { Platform } from "react-native";
 import * as SQLite from "expo-sqlite";
 
 export type Db = SQLite.SQLiteDatabase;
+type SqlBindValue = string | number | null;
 export type SqlStatement = {
   sql: string;
-  params?: (string | number | null)[];
+  params?: SqlBindValue[];
 };
 
 let db: Db | null = null;
@@ -28,32 +30,18 @@ const SQLITE_STARTUP_PRAGMAS: string[] = [
 
 function getDb(): Db {
   if (!db) {
-    db = SQLite.openDatabase("lumina.db");
+    // `openDatabaseSync` avoids async init races; we still run schema init via `initDb()`.
+    db = SQLite.openDatabaseSync("lumina.db");
   }
   return db;
 }
 
-function execSql<T = SQLite.SQLResultSetRowList>(
-  database: Db,
-  sql: string,
-  params: (string | number | null)[] = [],
-): Promise<SQLite.SQLResultSet> {
-  return new Promise((resolve, reject) => {
-    database.transaction(
-      (tx) => {
-        tx.executeSql(
-          sql,
-          params as any,
-          (_tx, result) => resolve(result),
-          (_tx, error) => {
-            reject(error);
-            return true;
-          },
-        );
-      },
-      (error) => reject(error),
-    );
-  });
+async function execPragmaBestEffort(database: Db, pragma: string): Promise<void> {
+  try {
+    await database.execAsync(pragma);
+  } catch {
+    // Some PRAGMAs can throw depending on platform/SQLite build; best-effort.
+  }
 }
 
 export async function initDb(): Promise<void> {
@@ -63,17 +51,11 @@ export async function initDb(): Promise<void> {
     const database = getDb();
 
     for (const pragma of SQLITE_STARTUP_PRAGMAS) {
-      try {
-        // Some PRAGMAs can throw depending on platform/SQLite build; best-effort.
-        // eslint-disable-next-line no-await-in-loop
-        await execSql(database, pragma);
-      } catch {
-        // ignore
-      }
+      // eslint-disable-next-line no-await-in-loop
+      await execPragmaBestEffort(database, pragma);
     }
 
-    await execSql(
-      database,
+    await database.execAsync(
       `CREATE TABLE IF NOT EXISTS reports (
         id TEXT PRIMARY KEY NOT NULL,
         created_at TEXT NOT NULL,
@@ -88,16 +70,14 @@ export async function initDb(): Promise<void> {
 
     // Migration for older installs: add needs_review if missing.
     try {
-      await execSql(
-        database,
+      await database.execAsync(
         `ALTER TABLE reports ADD COLUMN needs_review INTEGER NOT NULL DEFAULT 0;`,
       );
     } catch {
       // ignore if column already exists
     }
 
-    await execSql(
-      database,
+    await database.execAsync(
       `CREATE TABLE IF NOT EXISTS marker_index (
         report_id TEXT NOT NULL,
         marker_id TEXT NOT NULL,
@@ -109,13 +89,11 @@ export async function initDb(): Promise<void> {
       );`,
     );
 
-    await execSql(
-      database,
+    await database.execAsync(
       `CREATE INDEX IF NOT EXISTS idx_marker_index_marker_created_at ON marker_index(marker_id, created_at DESC);`,
     );
 
-    await execSql(
-      database,
+    await database.execAsync(
       `CREATE INDEX IF NOT EXISTS idx_reports_created_at ON reports(created_at DESC);`,
     );
   })();
@@ -125,45 +103,33 @@ export async function initDb(): Promise<void> {
 
 export async function execReadAll<T extends Record<string, any>>(
   sql: string,
-  params: (string | number | null)[] = [],
+  params: SqlBindValue[] = [],
 ): Promise<T[]> {
-  const database = getDb();
-  const result = await execSql(database, sql, params);
-  const rows: T[] = [];
-  for (let i = 0; i < result.rows.length; i += 1) {
-    rows.push(result.rows.item(i));
-  }
-  return rows;
+  return getDb().getAllAsync<T>(sql, params);
 }
 
 export async function execWrite(
   sql: string,
-  params: (string | number | null)[] = [],
+  params: SqlBindValue[] = [],
 ): Promise<void> {
-  const database = getDb();
-  await execSql(database, sql, params);
+  await getDb().runAsync(sql, params);
 }
 
 export async function execBatchWrite(statements: SqlStatement[]): Promise<void> {
   const database = getDb();
+  const run = async (runner: Pick<Db, "runAsync">) => {
+    for (const statement of statements) {
+      // eslint-disable-next-line no-await-in-loop
+      await runner.runAsync(statement.sql, statement.params ?? []);
+    }
+  };
 
-  await new Promise<void>((resolve, reject) => {
-    database.transaction(
-      (tx) => {
-        for (const statement of statements) {
-          tx.executeSql(
-            statement.sql,
-            (statement.params ?? []) as any,
-            undefined,
-            (_tx, error) => {
-              reject(error);
-              return true;
-            },
-          );
-        }
-      },
-      (error) => reject(error),
-      () => resolve(),
-    );
-  });
+  if (Platform.OS === "web") {
+    // On web, expo-sqlite does not support exclusive transactions.
+    // `withTransactionAsync` is still useful to reduce partial writes, but it isn't exclusive.
+    await database.withTransactionAsync(async () => run(database));
+    return;
+  }
+
+  await database.withExclusiveTransactionAsync(async (txn) => run(txn));
 }

@@ -10,6 +10,12 @@ bun install
 bun start
 ```
 
+## Verification
+
+- App typecheck (production code only): `cd expo-ai-chatbot && bun run typecheck`
+- Unit tests: `cd expo-ai-chatbot && bun test --timeout 30000`
+- Expo health checks: `cd expo-ai-chatbot && npx expo-doctor`
+
 ## Key flows
 
 - Onboarding: privacy notice + consent on first launch (`expo-ai-chatbot/src/app/(app)/onboarding.tsx`)

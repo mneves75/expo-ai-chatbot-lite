@@ -10,6 +10,7 @@
     "ios:device": "expo run:ios -d",
     "web": "expo start --web",
     "test": "bun test --timeout 30000",
+    "typecheck": "tsc -p tsconfig.typecheck.json --noEmit",
     "start:dev-client": "bun expo:prebuild && bun expo start --dev-client",
     "expo:prebuild": "expo prebuild --skip-dependency-update react-native,react",
     "expo:prebuild:android:clean": "npx expo prebuild -p android --clean",

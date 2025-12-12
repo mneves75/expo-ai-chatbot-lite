@@ -1,5 +1,11 @@
 /.idea/
 docs/
+!DOCS/
+!DOCS/**/*.md
+DOCS/GUIDELINES-REF
+DOCS/LAUDOS_SABIN/
+DOCS/ref_implementation_python/
+DOCS/**/*.pdf
 /.vscode/
 .DS_Store
 aisdk llm.txt

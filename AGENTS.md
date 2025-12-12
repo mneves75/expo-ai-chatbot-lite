@@ -19,6 +19,7 @@ Run commands from `expo-ai-chatbot/` (there is no root `package.json`).
 - Install + start: `cd expo-ai-chatbot && bun install && bun start`
 - Native run: `bun ios` / `bun android`
 - Unit tests: `bun test --timeout 30000`
+- App typecheck: `bun run typecheck`
 - Expo health checks: `npx expo-doctor`
 
 ## Coding Style & Naming Conventions
