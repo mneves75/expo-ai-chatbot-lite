@@ -1,7 +1,7 @@
 import { generateUUID } from "@/lib/utils";
 import { decryptJson, encryptJson } from "@/lib/crypto/encryptedJson";
 import type { EncryptedBlobV1 } from "@/lib/crypto/types";
-import { execBatchWrite, execReadAll, execWrite } from "@/lib/db/db";
+import { execBatchWrite, execReadAll } from "@/lib/db/db";
 import type { ReportPayload } from "@/lib/sabin/types";
 import { needsReviewFromAnalysis } from "@/lib/sabin/confidence";
 import { encryptMarkerIndexPayloadFromResult } from "@/lib/db/markerIndexPayload";
@@ -88,6 +88,9 @@ export async function insertReport(payload: ReportPayload): Promise<string> {
 }
 
 export async function deleteAllReports(): Promise<void> {
-  await execWrite("DELETE FROM marker_index;");
-  await execWrite("DELETE FROM reports;");
+  // Delete in a single batch for atomicity (avoid partial deletes if the app is killed mid-operation).
+  await execBatchWrite([
+    { sql: "DELETE FROM marker_index;" },
+    { sql: "DELETE FROM reports;" },
+  ]);
 }

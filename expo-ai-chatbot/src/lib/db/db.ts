@@ -11,6 +11,8 @@ export type SqlStatement = {
 let db: Db | null = null;
 let initPromise: Promise<void> | null = null;
 
+const DB_SCHEMA_VERSION = 1;
+
 const SQLITE_STARTUP_PRAGMAS: string[] = [
   // Concurrency + durability baseline (WAL enables concurrent readers during writes).
   "PRAGMA journal_mode = WAL;",
@@ -96,6 +98,21 @@ export async function initDb(): Promise<void> {
     await database.execAsync(
       `CREATE INDEX IF NOT EXISTS idx_reports_created_at ON reports(created_at DESC);`,
     );
+
+    // Schema versioning for forward-safe migrations. We keep this lightweight for now:
+    // version bumps should be paired with explicit migration steps.
+    try {
+      const row = await database.getFirstAsync<{ user_version: number }>(
+        "PRAGMA user_version;",
+        [],
+      );
+      const currentVersion = row?.user_version ?? 0;
+      if (currentVersion < DB_SCHEMA_VERSION) {
+        await database.execAsync(`PRAGMA user_version = ${DB_SCHEMA_VERSION};`);
+      }
+    } catch {
+      // Best-effort: lack of `user_version` should not block app startup.
+    }
   })();
 
   return initPromise;

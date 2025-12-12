@@ -10,6 +10,7 @@ type FakeRunResult = {
 type SqlCall =
   | { kind: "openDatabaseSync"; databaseName: string }
   | { kind: "execAsync"; sql: string }
+  | { kind: "getFirstAsync"; sql: string; params: SqlBindValue[] }
   | { kind: "runAsync"; sql: string; params: SqlBindValue[] }
   | { kind: "getAllAsync"; sql: string; params: SqlBindValue[] }
   | { kind: "withTransactionAsync" }
@@ -29,6 +30,11 @@ function createFakeDb(calls: SqlCall[]) {
   const db = {
     execAsync: async (sql: string) => {
       calls.push({ kind: "execAsync", sql });
+    },
+    getFirstAsync: async <T>(sql: string, params: SqlBindValue[] = []) => {
+      calls.push({ kind: "getFirstAsync", sql, params });
+      // Default: a brand-new database.
+      return { user_version: 0 } as unknown as T;
     },
     runAsync: async (sql: string, params: SqlBindValue[] = []) => {
       calls.push({ kind: "runAsync", sql, params });
@@ -91,6 +97,7 @@ describe("db.ts wrapper (unit)", () => {
     expect(execSqls.some((s) => s.includes("PRAGMA journal_mode = WAL"))).toBe(true);
     expect(execSqls.some((s) => s.includes("CREATE TABLE IF NOT EXISTS reports"))).toBe(true);
     expect(execSqls.some((s) => s.includes("CREATE TABLE IF NOT EXISTS marker_index"))).toBe(true);
+    expect(execSqls.some((s) => s.includes("PRAGMA user_version ="))).toBe(true);
   });
 
   it("execReadAll delegates to getAllAsync with params", async () => {

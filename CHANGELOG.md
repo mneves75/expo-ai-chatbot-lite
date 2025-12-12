@@ -17,6 +17,7 @@ All notable changes to this repository will be documented in this file.
 - Modernized the Expo SQLite wrapper to the current `expo-sqlite` API and removed unused template theme/UI plumbing (providers/toasts/design-system) to keep the shipped app minimal and maintainable.
 - Added a dedicated Expo app typecheck config (`expo-ai-chatbot/tsconfig.typecheck.json`) so `bun run typecheck` checks only production code (tests are still verified by `bun test`).
 - Switched report ID generation to crypto-grade UUID v4 (avoids `Math.random` collisions in persisted keys).
+- Strengthened DB correctness: schema versioning (`PRAGMA user_version`), atomic “delete all reports”, and regression tests enforcing offline-only behavior.
 
 ### Security
 - Best-effort cleanup for temporary cache artifacts created during import/export and OCR rendering, to reduce unencrypted residue on device.
